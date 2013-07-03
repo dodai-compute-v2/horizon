@@ -5,6 +5,7 @@
 # All Rights Reserved.
 #
 # Copyright 2012 NEC Corporation
+# Copyright 2013 National Institute of Informatics.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -39,13 +40,17 @@ class UpdateNetwork(forms.SelfHandlingForm):
     network_id = forms.CharField(label=_("ID"),
                                  widget=forms.TextInput(
                                      attrs={'readonly': 'readonly'}))
+    vlan_id = forms.CharField(label=_("VLAN ID"),
+                              widget=forms.TextInput(
+                                  attrs={'readonly': 'readonly'}))
     admin_state = forms.BooleanField(label=_("Admin State"), required=False)
     failure_url = 'horizon:project:networks:index'
 
     def handle(self, request, data):
         try:
             params = {'admin_state_up': data['admin_state'],
-                      'name': data['name']}
+                      'name': data['name'],
+                      'vlan_id': data['vlan_id']}
             network = api.quantum.network_modify(request, data['network_id'],
                                                  **params)
             msg = _('Network %s was successfully updated.') % data['name']

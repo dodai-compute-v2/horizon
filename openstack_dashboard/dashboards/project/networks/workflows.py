@@ -1,6 +1,7 @@
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 
 # Copyright 2012 NEC Corporation
+# Copyright 2013 National Institute of Informatics.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -39,6 +40,9 @@ class CreateNetworkInfoAction(workflows.Action):
                                help_text=_("Network Name. This field is "
                                            "optional."),
                                required=False)
+    vlan_id = forms.IntegerField(min_value=0,
+                                 label=_("VLAN ID"),
+                                 required=False)
     admin_state = forms.BooleanField(label=_("Admin State"),
                                      initial=True, required=False)
 
@@ -51,7 +55,7 @@ class CreateNetworkInfoAction(workflows.Action):
 
 class CreateNetworkInfo(workflows.Step):
     action_class = CreateNetworkInfoAction
-    contributes = ("net_name", "admin_state")
+    contributes = ("net_name", "admin_state", "vlan_id")
 
 
 class CreateSubnetInfoAction(workflows.Action):
@@ -257,7 +261,8 @@ class CreateNetwork(workflows.Workflow):
 
     def _create_network(self, request, data):
         try:
-            params = {'name': data['net_name'],
+            params = {'vlan_id': data['vlan_id'],
+                      'name': data['net_name'],
                       'admin_state_up': data['admin_state']}
             network = api.quantum.network_create(request, **params)
             network.set_id_as_name_if_empty()

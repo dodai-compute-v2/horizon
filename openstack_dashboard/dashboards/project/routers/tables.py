@@ -1,6 +1,7 @@
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 
 # Copyright 2012,  Nachi Ueno,  NTT MCL,  Inc.
+# Copyright 2013 National Institute of Informatics.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -137,5 +138,5 @@ class RoutersTable(tables.DataTable):
         verbose_name = _("Routers")
         status_columns = ["status"]
         row_class = UpdateRow
-        table_actions = (CreateRouter, DeleteRouter)
+        table_actions = (DeleteRouter,)
         row_actions = (SetGateway, ClearGateway, DeleteRouter)

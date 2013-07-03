@@ -1,6 +1,7 @@
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 
 # Copyright 2012 NEC Corporation
+# Copyright 2013 National Institute of Informatics.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -137,6 +138,7 @@ class UpdateView(user_views.UpdateView):
         return {'network_id': network['id'],
                 'tenant_id': network['tenant_id'],
                 'name': network['name'],
+                'vlan_id': data['vlan_id'],
                 'admin_state': network['admin_state_up'],
                 'shared': network['shared'],
                 'external': network['router__external']}

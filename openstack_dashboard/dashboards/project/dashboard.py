@@ -1,6 +1,7 @@
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 
 # Copyright 2012 Nebula, Inc.
+# Copyright 2013 National Institute of Informatics.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -32,10 +33,7 @@ class BasePanels(horizon.PanelGroup):
 class NetworkPanels(horizon.PanelGroup):
     slug = "network"
     name = _("Manage Network")
-    panels = ('networks',
-              'routers',
-              'loadbalancers',
-              'network_topology',)
+    panels = ('networks',)
 
 
 class ObjectStorePanels(horizon.PanelGroup):

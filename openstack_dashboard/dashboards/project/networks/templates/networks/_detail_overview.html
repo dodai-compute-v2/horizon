@@ -10,6 +10,8 @@
     <dd>{{ network.id|default:"None" }}</dd>
     <dt>{% trans "Project ID" %}</dt>
     <dd>{{ network.tenant_id|default:"-" }}</dd>
+    <dt>{% trans "VLAN ID" %}</dt>
+    <dd>{{ network.vlan_id|default:"-" }}</dd>
     <dt>{% trans "Status" %}</dt>
     <dd>{{ network.status|default:"Unknown" }}</dd>
     <dt>{% trans "Admin State" %}</dt>

@@ -1,6 +1,7 @@
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 
 # Copyright 2012 Nebula, Inc.
+# Copyright 2013 National Institute of Informatics.
 #
 #    Licensed under the Apache License, Version 2.0 (the "License"); you may
 #    not use this file except in compliance with the License. You may obtain
@@ -352,7 +353,7 @@ class SimpleDisassociateIP(tables.Action):
     def single(self, table, request, instance_id):
         try:
             fips = [fip for fip in api.network.tenant_floating_ip_list(request)
-                    if fip.port_id == instance_id]
+                    if fip.instance_id == instance_id]
             # Removing multiple floating IPs at once doesn't work, so this pops
             # off the first one.
             if fips:

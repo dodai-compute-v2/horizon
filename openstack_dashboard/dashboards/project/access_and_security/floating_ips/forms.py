@@ -43,6 +43,7 @@ class FloatingIpAllocate(forms.SelfHandlingForm):
             messages.success(request,
                              _('Allocated Floating IP %(ip)s.')
                              % {"ip": fip.ip})
+            fip.id = fip.pool + '_' + fip.id
             return fip
         except:
             exceptions.handle(request, _('Unable to allocate Floating IP.'))

@@ -106,4 +106,31 @@ horizon.addInitFunction(function () {
   horizon.modals.addModalInitFunction(function (modal) {
     $(modal).find("#id_volume_type").change();
   });
+
+  /*
+  Floating ip and port pair should be selectable only when pairs belong same network
+  */
+  $(document).on('click', '.workflow #id_instance_id', function (evt) {
+    var ip = $('.workflow #id_ip_id');
+    if (ip.val() === "") {
+      $(this).find('option').each(function() {
+        if (this.value !== "") {
+          $(this).hide();
+        }
+      })
+    }
+  });
+  $(document).on('change', '.workflow #id_ip_id', function (evt) {
+    var port = $('.workflow #id_instance_id');
+    port.val("");
+    var ip_id = this.value;
+    var network_id = ip_id.split("_")[0];
+    port.find('option').each(function(){
+      if (this.value === "" || this.value.split("_")[0] === network_id) {
+        $(this).show();
+      } else {
+        $(this).hide();
+      }
+    })
+  });
 });

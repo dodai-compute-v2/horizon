@@ -32,7 +32,6 @@ ALLOCATE_URL = "horizon:project:access_and_security:floating_ips:allocate"
 
 class AssociateIPAction(workflows.Action):
     ip_id = forms.DynamicTypedChoiceField(label=_("IP Address"),
-                                          coerce=get_int_or_uuid,
                                           empty_value=None,
                                           add_item_link=ALLOCATE_URL)
     instance_id = forms.ChoiceField(label=_("Instance"))
@@ -69,7 +68,7 @@ class AssociateIPAction(workflows.Action):
             exceptions.handle(self.request,
                               _('Unable to retrieve floating IP addresses.'),
                               redirect=redirect)
-        options = sorted([(ip.id, ip.ip) for ip in ips if not ip.port_id])
+        options = sorted([(ip.pool + '_' + ip.id, ip.ip) for ip in ips if not ip.port_id])
         if options:
             options.insert(0, ("", _("Select an IP address")))
         else:
@@ -87,6 +86,8 @@ class AssociateIPAction(workflows.Action):
                               redirect=redirect)
         instances = []
         for target in targets:
+            if 'instance_id' not in self.initial or \
+                    target.get('device_id') == self.initial['instance_id']:
             instances.append((target.id, target.name))
 
         # Sort instances for easy browsing

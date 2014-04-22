@@ -18,8 +18,33 @@
       </span>
     </div>
     {% endif %}
+    {% for message in messages %}
+      {% if "info" in message.tags %}
+        <div class="alert alert-block alert-info fade in">
+          <p><strong>{% trans "Info: " %}</strong>{{ message }}</p>
+        </div>
+      {% endif %}
+      {% if "warning" in message.tags %}
+        <div class="alert alert-block alert-warning fade in">
+          <p><strong>{% trans "Warning: " %}</strong>{{ message }}</p>
+        </div>
+      {% endif %}
+      {% if "success" in message.tags %}
+        <div class="alert alert-block alert-success fade in">
+          <p><strong>{% trans "Success: " %}</strong>{{ message }}</p>
+        </div>
+      {% endif %}
+      {% if "error" in message.tags %}
+        <div class="alert alert-block alert-error fade in">
+          <p><strong>{% trans "Error: " %}</strong>{{ message }}</p>
+        </div>
+      {% endif %}
+    {% endfor %}
     {% if next %}<input type="hidden" name="{{ redirect_field_name }}" value="{{ next }}" />{% endif %}
     {% include "horizon/common/_form_fields.html" %}
+    {% if gakunin_configured %}
+    <div align="center"><a href="{{ gakunin_login_url }}">Sign In with GakuNin</a></div>
+    {% endif %}
   </fieldset>
 {% endblock %}
 

@@ -24,6 +24,8 @@ from django.forms import ValidationError
 from django.utils.translation import force_unicode, ugettext_lazy as _
 from django.views.decorators.debug import sensitive_variables
 
+import keystoneclient.exceptions
+
 from horizon import exceptions
 from horizon import forms
 from horizon import messages
@@ -61,6 +63,7 @@ ADD_PROJECT_URL = "horizon:admin:projects:create"
 class CreateUserForm(BaseUserForm):
     name = forms.CharField(label=_("User Name"))
     email = forms.EmailField(label=_("Email"))
+    eppn = forms.CharField(label=_("ePPN"), required=False)
     password = forms.RegexField(
             label=_("Password"),
             widget=forms.PasswordInput(render_value=False),
@@ -86,9 +89,13 @@ class CreateUserForm(BaseUserForm):
     def handle(self, request, data):
         try:
             LOG.info('Creating user with name "%s"' % data['name'])
+            # NOTE: ePPN must not be '' due to unique constraint
+            if data['eppn'] == '':
+                data['eppn'] = None
             new_user = api.keystone.user_create(request,
                                                 data['name'],
                                                 data['email'],
+                                                data['eppn'],
                                                 data['password'],
                                                 data['tenant_id'],
                                                 True)
@@ -101,7 +108,13 @@ class CreateUserForm(BaseUserForm):
                                              data['tenant_id'],
                                              new_user.id,
                                              data['role_id'])
-                except:
+                # NOTE: User already has default role of primary tenant.
+                #       So, if Conflict raises, pass it.
+                except Exception as e:
+                    if (isinstance(e, keystoneclient.exceptions.ClientException)
+                        and hasattr(e, 'code') and e.code == 409):
+                        pass
+                    else:
                     exceptions.handle(request,
                                       _('Unable to add user'
                                         'to primary project.'))
@@ -114,6 +127,7 @@ class UpdateUserForm(BaseUserForm):
     id = forms.CharField(label=_("ID"), widget=forms.HiddenInput)
     name = forms.CharField(label=_("User Name"))
     email = forms.EmailField(label=_("Email"))
+    eppn = forms.CharField(label=_("ePPN"), required=False)
     password = forms.RegexField(label=_("Password"),
             widget=forms.PasswordInput(render_value=False),
             regex=validators.password_validator(),
@@ -130,7 +144,8 @@ class UpdateUserForm(BaseUserForm):
         super(UpdateUserForm, self).__init__(request, *args, **kwargs)
 
         if api.keystone.keystone_can_edit_user() is False:
-            for field in ('name', 'email', 'password', 'confirm_password'):
+            for field in ('name', 'email', 'eppn', 'password',
+                          'confirm_password'):
                 self.fields.pop(field)
 
     # We have to protect the entire "data" dict because it contains the
@@ -149,6 +164,9 @@ class UpdateUserForm(BaseUserForm):
         if user_is_editable:
             # Update user details
             msg_bits = (_('name'), _('email'))
+            # NOTE: ePPN must not be '' due to unique constraint
+            if data['eppn'] == '':
+                data['eppn'] = None
             try:
                 api.keystone.user_update(request, user, **data)
                 succeeded.extend(msg_bits)
@@ -161,7 +179,13 @@ class UpdateUserForm(BaseUserForm):
         try:
             api.keystone.user_update_tenant(request, user, tenant)
             succeeded.extend(msg_bits)
-        except:
+        # NOTE: User already has default role of primary tenant.
+        #       So, if Conflict raises, pass it.
+        except Exception as e:
+            if (isinstance(e, keystoneclient.exceptions.ClientException)
+                and hasattr(e, 'code') and e.code == 409):
+                pass
+            else:
             failed.append(msg_bits)
             exceptions.handle(request, ignore=True)
 

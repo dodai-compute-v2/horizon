@@ -47,5 +47,5 @@ class AdminImagesTable(ImagesTable):
     class Meta:
         name = "images"
         verbose_name = _("Images")
-        table_actions = (AdminCreateImage, AdminDeleteImage)
+        table_actions = (AdminDeleteImage,)
         row_actions = (AdminEditImage, AdminDeleteImage)

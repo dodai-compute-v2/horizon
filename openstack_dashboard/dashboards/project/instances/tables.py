@@ -305,7 +305,8 @@ class AssociateIP(tables.LinkAction):
         fip = api.network.NetworkClient(request).floating_ips
         if fip.is_simple_associate_supported():
             return False
-        return not is_deleting(instance)
+        task_state = getattr(instance, "OS-EXT-STS:task_state", None)
+        return instance.status in ACTIVE_STATES and task_state is None
 
     def get_link_url(self, datum):
         base_url = urlresolvers.reverse(self.url)
@@ -348,7 +349,8 @@ class SimpleDisassociateIP(tables.Action):
     def allowed(self, request, instance):
         if not HORIZON_CONFIG["simple_ip_management"]:
             return False
-        return not is_deleting(instance)
+        task_state = getattr(instance, "OS-EXT-STS:task_state", None)
+        return instance.status in ACTIVE_STATES and task_state is None
 
     def single(self, table, request, instance_id):
         try:
@@ -380,6 +382,35 @@ class UpdateRow(tables.Row):
         instance.full_flavor = api.nova.flavor_get(request,
                                                    instance.flavor["id"])
         return instance
+
+
+class StartInstance(tables.BatchAction):
+    name = "start"
+    action_present = _("Start")
+    action_past = _("Started")
+    data_type_singular = _("Instance")
+    data_type_plural = _("Instances")
+
+    def allowed(self, request, instance):
+        return instance.status in ("SHUTDOWN", "SHUTOFF", "CRASHED")
+
+    def action(self, request, obj_id):
+        api.nova.server_start(request, obj_id)
+
+
+class StopInstance(tables.BatchAction):
+    name = "stop"
+    action_present = _("Shut Off")
+    action_past = _("Shut Off")
+    data_type_singular = _("Instance")
+    data_type_plural = _("Instances")
+    classes = ('btn-danger',)
+
+    def allowed(self, request, instance):
+        return get_power_state(instance) in ("RUNNING", "PAUSED", "SUSPENDED")
+
+    def action(self, request, obj_id):
+        api.nova.server_stop(request, obj_id)
 
 
 def get_ips(instance):
@@ -472,9 +503,7 @@ class InstancesTable(tables.DataTable):
         status_columns = ["status", "task"]
         row_class = UpdateRow
         table_actions = (LaunchLink, TerminateInstance)
-        row_actions = (ConfirmResize, RevertResize, CreateSnapshot,
+        row_actions = (StartInstance, ConfirmResize, RevertResize,
                        SimpleAssociateIP, AssociateIP,
                        SimpleDisassociateIP, EditInstance,
-                       EditInstanceSecurityGroups, ConsoleLink, LogLink,
-                       TogglePause, ToggleSuspend, SoftRebootInstance,
-                       RebootInstance, TerminateInstance)
+                       RebootInstance, StopInstance, TerminateInstance)

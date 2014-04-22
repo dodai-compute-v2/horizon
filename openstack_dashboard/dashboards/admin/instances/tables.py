@@ -27,9 +27,9 @@ from openstack_dashboard import api
 from openstack_dashboard.dashboards.project.instances.tables import (
         TerminateInstance, EditInstance, ConsoleLink, LogLink, CreateSnapshot,
         TogglePause, ToggleSuspend, RebootInstance, SoftRebootInstance,
-        ConfirmResize, RevertResize, get_size, UpdateRow, get_ips,
-        get_power_state, is_deleting, ACTIVE_STATES, STATUS_DISPLAY_CHOICES,
-        TASK_DISPLAY_CHOICES)
+        ConfirmResize, RevertResize, StartInstance, StopInstance,
+        get_size, UpdateRow, get_ips, get_power_state, is_deleting,
+        ACTIVE_STATES, STATUS_DISPLAY_CHOICES, TASK_DISPLAY_CHOICES)
 
 LOG = logging.getLogger(__name__)
 
@@ -116,7 +116,6 @@ class AdminInstancesTable(tables.DataTable):
         status_columns = ["status", "task"]
         table_actions = (TerminateInstance,)
         row_class = AdminUpdateRow
-        row_actions = (ConfirmResize, RevertResize, AdminEditInstance,
-                       ConsoleLink, LogLink, CreateSnapshot, TogglePause,
-                       ToggleSuspend, MigrateInstance, SoftRebootInstance,
-                       RebootInstance, TerminateInstance)
+        row_actions = (StartInstance, ConfirmResize, RevertResize,
+                       AdminEditInstance, TogglePause, ToggleSuspend,
+                       RebootInstance, StopInstance, TerminateInstance)

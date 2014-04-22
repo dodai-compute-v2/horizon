@@ -191,6 +191,6 @@ class ImagesTable(tables.DataTable):
         # Hide the image_type column. Done this way so subclasses still get
         # all the columns by default.
         columns = ["name", "status", "public", "disk_format"]
-        table_actions = (OwnerFilter, CreateImage, DeleteImage,)
+        table_actions = (OwnerFilter, DeleteImage,)
         row_actions = (LaunchImage, EditImage, DeleteImage,)
         pagination_param = "image_marker"

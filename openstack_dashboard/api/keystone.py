@@ -186,10 +186,11 @@ def user_list(request, tenant_id=None):
     return keystoneclient(request, admin=True).users.list(tenant_id=tenant_id)
 
 
-def user_create(request, user_id, email, password, tenant_id, enabled):
+def user_create(request, user_id, email, eppn, password, tenant_id, enabled):
     return keystoneclient(request, admin=True).users.create(user_id,
                                                             password,
                                                             email,
+                                                            eppn,
                                                             tenant_id,
                                                             enabled)
 

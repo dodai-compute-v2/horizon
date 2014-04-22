@@ -471,8 +471,7 @@ class LaunchInstance(workflows.Workflow):
                      SetInstanceDetails,
                      SetAccessControls,
                      SetNetwork,
-                     VolumeOptions,
-                     PostCreationStep)
+                     VolumeOptions)
 
     def format_status_message(self, message):
         name = self.context.get('name', 'unknown instance')

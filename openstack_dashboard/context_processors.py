@@ -60,4 +60,15 @@ def openstack(request):
                              region in available_regions]}
     context['regions'] = regions
 
+    # Gakunin context/support
+    context.update(gakunin(request))
+    context.update(gakunin_url(request))
+
     return context
+
+
+def gakunin(request):
+    return {'gakunin_configured' : settings.GAKUNIN_ENABLED }
+
+def gakunin_url(request):
+    return {'gakunin_login_url' : getattr(settings, 'GAKUNIN_LOGIN_URL', '/auth/gakunin') }

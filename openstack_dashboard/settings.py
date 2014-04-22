@@ -189,6 +189,9 @@ COMPRESS_OFFLINE_CONTEXT = {
     'HORIZON_CONFIG': HORIZON_CONFIG
 }
 
+GAKUNIN_ENABLED = False
+GAKUNIN_FORCE_SSL = False
+
 if DEBUG:
     logging.basicConfig(level=logging.DEBUG)
 

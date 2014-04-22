@@ -154,11 +154,15 @@ class FloatingIpManager(network.FloatingIpManager):
 
     def associate(self, floating_ip_id, port_id):
         # NOTE: In Quantum Horizon floating IP support, port_id is
-        # "<port_id>_<ip_address>" format to identify multiple ports.
-        pid, ip_address = port_id.split('_', 1)
+        # "<network_id>_<port_id>_<ip_address>" format to identify multiple ports.
+        _, pid, ip_address = port_id.split('_', 2)
         update_dict = {'port_id': pid,
                        'fixed_ip_address': ip_address}
-        self.client.update_floatingip(floating_ip_id,
+        # NOTE: In Quantum Horizon with dodai floating IP support,
+        # floating_ip_id is
+        # "<network_id>_<floating_ip_id>" format to validation network.
+        _, fip_id = floating_ip_id.split('_', 1)
+        self.client.update_floatingip(fip_id,
                                       {'floatingip': update_dict})
 
     def disassociate(self, floating_ip_id, port_id):
@@ -179,7 +183,8 @@ class FloatingIpManager(network.FloatingIpManager):
             server_name = server_dict.get(p.device_id)
             for ip in p.fixed_ips:
                 target = {'name': '%s: %s' % (server_name, ip['ip_address']),
-                          'id': '%s_%s' % (port_id, ip['ip_address'])}
+                          'id': '%s_%s_%s' % (p.network_id, port_id, ip['ip_address']),
+                          'device_id': p.device_id}
                 targets.append(FloatingIpTarget(target))
         return targets
 
